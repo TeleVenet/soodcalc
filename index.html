@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>محاسبه وام مانده‌کاهشی (اصل مساوی)</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      direction: rtl;
+      background: linear-gradient(135deg, #a8dadc, #457b9d);
+      color: #1d3557;
+      margin: 0;
+      padding: 0;
+      animation: fadeIn 1.5s ease-in;
+    }
+    .container {
+      width: 90%;
+      margin: 20px auto;
+      background: #f1faee;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: slideIn 1.2s ease-out;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #444;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background: #a8dadc;
+    }
+    input {
+      width: 150px;
+      padding: 4px;
+      margin: 4px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 6px 12px;
+      margin-top: 10px;
+      background: #457b9d;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background: #1d3557;
+    }
+    h2, h3 { text-align: center; }
+
+    /* انیمیشن‌ها */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideIn {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>محاسبه وام با سود مانده‌کاهشی (اصل مساوی)</h2>
+
+    <label>مبلغ وام: <input type="number" id="loan" value="10000000"></label><br>
+    <label>نرخ سود ماهانه (مثلاً 0.04 برای ۴٪): <input type="number" step="0.001" id="rate" value="0.04"></label><br>
+    <label>تعداد اقساط: <input type="number" id="months" value="12"></label><br>
+    <button onclick="calculate()">محاسبه</button>
+
+    <table id="resultTable">
+      <thead>
+        <tr>
+          <th>ماه</th>
+          <th>مانده اول دوره</th>
+          <th>سود ماه</th>
+          <th>اصل پرداختی</th>
+          <th>قسط کل (اصل+سود)</th>
+          <th>مانده پایان دوره</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <h3 id="totalInterest"></h3>
+  </div>
+
+  <script>
+    function formatNumber(num) {
+      return num.toLocaleString('fa-IR');
+    }
+
+    function calculate() {
+      const loan = parseFloat(document.getElementById('loan').value);
+      const rate = parseFloat(document.getElementById('rate').value);
+      const months = parseInt(document.getElementById('months').value);
+
+      const principalPart = loan / months; // اصل مساوی هر ماه
+
+      let balance = loan;
+      let totalInterest = 0;
+      const tbody = document.querySelector("#resultTable tbody");
+      tbody.innerHTML = "";
+
+      for (let m = 1; m <= months; m++) {
+        const interest = balance * rate;
+        const installment = principalPart + interest;
+        const endBalance = balance - principalPart;
+        totalInterest += interest;
+
+        const row = `<tr>
+          <td>${m}</td>
+          <td>${formatNumber(balance.toFixed(0))}</td>
+          <td>${formatNumber(interest.toFixed(0))}</td>
+          <td>${formatNumber(principalPart.toFixed(0))}</td>
+          <td>${formatNumber(installment.toFixed(0))}</td>
+          <td>${formatNumber(endBalance.toFixed(0))}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+
+        balance = endBalance;
+      }
+
+      document.getElementById("totalInterest").innerText =
+        "جمع کل سود پرداختی: " + formatNumber(totalInterest.toFixed(0)) + " ریال";
+    }
+  </script>
+</body>
+</html>
